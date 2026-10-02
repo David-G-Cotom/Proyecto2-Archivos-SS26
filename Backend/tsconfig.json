@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "NodeNext",   // Permite importaciones estilo ESM (import/export)
+        "moduleResolution": "NodeNext", // Obliga a incluir la extension del archivo en los imports
+        "outDir": "dist",
+        "rootDir": "src",
+        "strict": true,
+        "esModuleInterop": true,    // Permite importaciones estilo ES6 (import express from 'express')
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,   // Case sensitive en los nombres de archivo para los imports
+        "sourceMap": true   // Mapear JS compilado devuelta a TS para debugging
+    },
+    "include": [
+        "src"   // Compilacion solo de los archivos en src/
+    ]
+}
