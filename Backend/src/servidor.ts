@@ -1,8 +1,9 @@
 import { crearApp } from "./app.js";
+import { conectarBaseDatos, desconectarBaseDatos } from "./config/baseDatos.js";
 import { entorno } from "./config/entorno.js";
 
 async function iniciar(): Promise<void> {
-    // conectar BD
+    await conectarBaseDatos();
     // inicializar Indices en BD
 
     const servidor = crearApp().listen(entorno.puerto, () => {
@@ -12,7 +13,7 @@ async function iniciar(): Promise<void> {
     const apagar = (signal: string): void => {
         console.log(`[SERVIDOR] ${signal} recibida, cerrando...`);
         servidor.close(() => {
-            // desconectar BD
+            void desconectarBaseDatos().finally(() => process.exit(0));
         });
     };
     process.on('SIGINT', () => apagar('SIGINT'));

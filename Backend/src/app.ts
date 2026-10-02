@@ -2,6 +2,8 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import { entorno } from './config/entorno.js';
+import { rutaNoEncontrada } from './middlewares/rutaNoEncontrada.js';
+import { manejadorErrores } from './middlewares/manejadorErrores.js';
 
 export function crearApp(): express.Express {
     const app = express();
@@ -13,11 +15,11 @@ export function crearApp(): express.Express {
             exposedHeaders: ['Content-Disposition'], // El cliente necesita leer el nombre del archivo al descargar
         }),
     );
-    app.use(express.json());
+    app.use(express.json({ limit: '5mb' }));
 
     // rutas Api
-    // ruta No Encontrada
-    // manejador Errores
+    app.use(rutaNoEncontrada);
+    app.use(manejadorErrores);
 
     return app;
 }
