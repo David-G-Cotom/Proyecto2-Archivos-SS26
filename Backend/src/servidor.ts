@@ -1,10 +1,11 @@
 import { crearApp } from "./app.js";
 import { conectarBaseDatos, desconectarBaseDatos } from "./config/baseDatos.js";
 import { entorno } from "./config/entorno.js";
+import { inicializarIndices } from "./models/index.js";
 
 async function iniciar(): Promise<void> {
     await conectarBaseDatos();
-    // inicializar Indices en BD
+    await inicializarIndices();
 
     const servidor = crearApp().listen(entorno.puerto, () => {
         console.log(`[SERVIDOR] API lista en http://localhost:${entorno.puerto}/api`);
