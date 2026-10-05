@@ -1,0 +1,19 @@
+<section class="bienvenida">
+    <h2>Hola, {{ primerNombre() }}</h2>
+    <p>¿Qué quieres hacer hoy? Elige una sección para comenzar</p>
+</section>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+    @for (seccion of secciones(); track seccion.ruta) {
+    <div class="col">
+        <a class="tarjeta-seccion" [routerLink]="seccion.ruta">
+            <span class="tarjeta-seccion__icono"><i [class]="'bi ' + seccion.icono" aria-hidden="true"></i></span>
+            <span class="tarjeta-seccion__texto">
+                <strong>{{ seccion.etiqueta }}</strong>
+                <small>{{ seccion.descripcion }}</small>
+            </span>
+            <i class="bi bi-arrow-right-short flecha" aria-hidden="true"></i>
+        </a>
+    </div>
+    }
+</div>

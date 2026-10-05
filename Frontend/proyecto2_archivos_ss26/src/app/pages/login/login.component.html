@@ -1,0 +1,76 @@
+<div class="pantalla">
+    <!-- Panel de marca: solo en pantallas medianas y grandes -->
+    <aside class="panel-marca" aria-hidden="true">
+        <div class="panel-marca__contenido">
+            <span class="logo"><i class="bi bi-folder2-open"></i></span>
+            <h2>Gestor Documental</h2>
+            <p>Almacena, organiza y comparte los documentos de tu organización en un solo lugar.</p>
+            <ul>
+                <li><i class="bi bi-folder2"></i> Carpetas y subcarpetas</li>
+                <li><i class="bi bi-people"></i> Comparte con permisos</li>
+                <li><i class="bi bi-trash3"></i> Papelera con restauración</li>
+                <li><i class="bi bi-clock-history"></i> Historial de actividad</li>
+            </ul>
+        </div>
+    </aside>
+
+    <main id="contenido-principal" class="panel-formulario" tabindex="-1">
+        <div class="tarjeta">
+            <div class="marca-movil">
+                <span class="logo logo--pequeno" aria-hidden="true"><i class="bi bi-folder2-open"></i></span>
+                <strong>Gestor Documental</strong>
+            </div>
+
+            <h1>Iniciar sesión</h1>
+            <p class="texto-suave">Ingresa con tus credenciales para continuar.</p>
+
+            @if (errorMensaje()) {
+            <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+                <i class="bi bi-exclamation-circle-fill mt-1" aria-hidden="true"></i>
+                <span>{{ errorMensaje() }}</span>
+            </div>
+            }
+
+            <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Usuario</label>
+                    <input id="username" type="text" class="form-control form-control-lg" formControlName="username"
+                        autocomplete="username" autocapitalize="none" spellcheck="false" autofocus
+                        [class.is-invalid]="campoInvalido('username')" [attr.aria-invalid]="campoInvalido('username')"
+                        [attr.aria-describedby]="campoInvalido('username') ? 'error-usuario' : null" />
+                    @if (campoInvalido('username')) {
+                    <div id="error-usuario" class="invalid-feedback">Ingresa tu nombre de usuario.</div>
+                    }
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-group input-group-lg has-validation">
+                        <input id="password" [type]="viewPassword() ? 'text' : 'password'" class="form-control"
+                            formControlName="password" autocomplete="current-password"
+                            [class.is-invalid]="campoInvalido('password')"
+                            [attr.aria-invalid]="campoInvalido('password')"
+                            [attr.aria-describedby]="campoInvalido('password') ? 'error-password' : null" />
+                        <button type="button" class="btn btn-outline-secondary" (click)="togglePassword()"
+                            [attr.aria-pressed]="viewPassword()"
+                            [attr.aria-label]="viewPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                            <i [class]="viewPassword() ? 'bi bi-eye-slash' : 'bi bi-eye'" aria-hidden="true"></i>
+                        </button>
+                        @if (campoInvalido('password')) {
+                        <div id="error-password" class="invalid-feedback">Ingresa tu contraseña.</div>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100" [disabled]="cargando()">
+                    @if (cargando()) {
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    Ingresando…
+                    } @else {
+                    Ingresar
+                    }
+                </button>
+            </form>
+        </div>
+    </main>
+</div>
