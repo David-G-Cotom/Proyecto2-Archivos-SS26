@@ -1,0 +1,82 @@
+<!-- ===================== Barra lateral ===================== -->
+<aside id="barra-lateral" class="barra-lateral" [class.barra-lateral--abierta]="menuAbierto()"
+    aria-label="Navegación principal">
+    <a class="marca" routerLink="/inicio" aria-label="Ir al inicio">
+        <span class="marca__icono"><i class="bi bi-folder2-open" aria-hidden="true"></i></span>
+        <span class="marca__texto">
+            <strong>Gestor Documental</strong>
+        </span>
+    </a>
+
+    <nav class="navegacion">
+        @for (grupo of gruposMenu(); track grupo.titulo) {
+        <p class="navegacion__grupo" [id]="'grupo-' + $index">{{ grupo.titulo }}</p>
+        <ul class="navegacion__lista" [attr.aria-labelledby]="'grupo-' + $index">
+            @for (elemento of grupo.elementos; track elemento.ruta) {
+            <li>
+                <a class="enlace" [routerLink]="elemento.ruta" routerLinkActive="enlace--activo"
+                    ariaCurrentWhenActive="page">
+                    <i [class]="'bi ' + elemento.icono" aria-hidden="true"></i>
+                    <span>{{ elemento.etiqueta }}</span>
+                </a>
+            </li>
+            }
+        </ul>
+        }
+    </nav>
+</aside>
+
+<!-- Fondo oscuro que cierra el panel al tocar fuera (solo móvil/tablet) -->
+@if (menuAbierto()) {
+<div class="telon" (click)="cerrarMenus()" aria-hidden="true"></div>
+}
+
+<!-- ===================== Área principal ===================== -->
+<div class="area-principal">
+    <header class="barra-superior">
+        <button type="button" class="boton-menu" aria-label="Abrir menú de navegación" aria-controls="barra-lateral"
+            [attr.aria-expanded]="menuAbierto()" (click)="alternarMenu()">
+            <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+
+        <h1 class="titulo-pagina">{{ tituloPagina }}</h1>
+
+        <div class="menu-usuario">
+            <button type="button" class="boton-usuario" aria-haspopup="menu" aria-controls="menu-usuario"
+                [attr.aria-expanded]="menuUsuarioAbierto()" (click)="alternarMenuUsuario()">
+                <span class="boton-usuario__datos">
+                    <strong>{{ usuario()?.nombreCompleto }}</strong>
+                    <small>{{ etiquetaRol() }}</small>
+                </span>
+                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+
+            @if (menuUsuarioAbierto()) {
+            <!-- Capa transparente: un clic en cualquier otro lugar cierra el desplegable -->
+            <div class="cortina" (click)="cerrarMenus()" aria-hidden="true"></div>
+            <div id="menu-usuario" class="desplegable" role="menu">
+                <div class="desplegable__cabecera">
+                    <strong>{{ usuario()?.nombreCompleto }}</strong>
+                    <small>{{ usuario()?.correo }}</small>
+                </div>
+                <button type="button" class="desplegable__opcion" role="menuitem" (click)="abrirChangePassword()">
+                    <i class="bi bi-key" aria-hidden="true"></i>
+                    Cambiar contraseña
+                </button>
+                <button type="button" class="desplegable__opcion" role="menuitem" (click)="cerrarSesion()">
+                    <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                    Cerrar sesión
+                </button>
+            </div>
+            }
+        </div>
+    </header>
+
+    <main id="contenido-principal" class="contenido" tabindex="-1">
+        <router-outlet />
+    </main>
+</div>
+
+@if (changingPassword()) {
+<app-change-password (cerrado)="changingPassword.set(false)" />
+}

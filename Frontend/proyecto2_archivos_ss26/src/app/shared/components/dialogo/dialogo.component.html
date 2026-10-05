@@ -1,0 +1,13 @@
+<dialog #dialogo class="dialogo" [class.dialogo--pequeno]="ancho() === 'sm'" [attr.aria-labelledby]="idTitulo"
+    (cancel)="alCancelar($event)" (close)="cerrado.emit()" (click)="alHacerClic($event)">
+    <div class="dialogo__caja">
+        <header class="dialogo__cabecera">
+            <h2 [id]="idTitulo">{{ titulo() }}</h2>
+            <button type="button" class="btn-close" aria-label="Cerrar" [disabled]="bloqueado()"
+                (click)="cerrar()"></button>
+        </header>
+        <div class="dialogo__cuerpo">
+            <ng-content />
+        </div>
+    </div>
+</dialog>

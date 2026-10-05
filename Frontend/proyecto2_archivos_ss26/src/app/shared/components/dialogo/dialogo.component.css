@@ -1,0 +1,60 @@
+.dialogo {
+    width: min(560px, calc(100vw - 2rem));
+    max-height: calc(100vh - 2rem);
+    padding: 0;
+    /* sin relleno: así un clic en el fondo oscuro se distingue del clic en el contenido */
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 20px 60px rgb(15 23 42 / 0.3);
+    color: var(--bs-body-color);
+}
+
+.dialogo--pequeno {
+    width: min(440px, calc(100vw - 2rem));
+}
+
+.dialogo::backdrop {
+    background: rgb(15 23 42 / 0.5);
+}
+
+.dialogo[open] {
+    animation: aparecer 0.18s ease-out;
+}
+
+.dialogo__caja {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 2rem);
+}
+
+.dialogo__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.dialogo__cuerpo {
+    padding: 1.4rem;
+    overflow-y: auto;
+}
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}

@@ -44,7 +44,7 @@ export function erroresPorCampo(error: unknown): Record<string, string> {
             }
         }
     } else if (esObjeto(detalles)) {
-        // El backend envía: detalles: { campo: 'nombreUsuario' }
+        // El backend envía: detalles: { campo: 'username' }
         if (typeof detalles['campo'] === 'string') resultado[detalles['campo']] = mensajeGeneral;
         // El backend envía: detalles: { campos: ['correo', 'rut'] }
         if (Array.isArray(detalles['campos'])) {
