@@ -1,0 +1,87 @@
+.contenedor {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: min(380px, calc(100vw - 2rem));
+    pointer-events: none;
+    /* el contenedor no bloquea clics; solo los avisos */
+}
+
+.aviso {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: #fff;
+    border: 1px solid var(--bs-border-color);
+    border-left-width: 5px;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 24px rgb(15 23 42 / 0.14);
+    animation: entrar 0.2s ease-out;
+}
+
+.aviso>i {
+    font-size: 1.2rem;
+    line-height: 1.4;
+}
+
+.aviso__texto {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.925rem;
+}
+
+.btn-close {
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+}
+
+.aviso--exito {
+    border-left-color: var(--bs-success);
+}
+
+.aviso--exito>i {
+    color: var(--bs-success);
+}
+
+.aviso--error {
+    border-left-color: var(--bs-danger);
+}
+
+.aviso--error>i {
+    color: var(--bs-danger);
+}
+
+.aviso--info {
+    border-left-color: var(--bs-info);
+}
+
+.aviso--info>i {
+    color: var(--bs-info);
+}
+
+.aviso--advertencia {
+    border-left-color: var(--bs-warning);
+}
+
+.aviso--advertencia>i {
+    color: #b45309;
+}
+
+@keyframes entrar {
+    from {
+        opacity: 0;
+        transform: translateX(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}

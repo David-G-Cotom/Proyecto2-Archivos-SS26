@@ -1,0 +1,14 @@
+<section class="contenedor" aria-label="Notificaciones">
+    @for (aviso of avisos.lista(); track aviso.id) {
+    <div [class]="'aviso aviso--' + aviso.tipo" [attr.role]="aviso.tipo === 'error' ? 'alert' : 'status'">
+        <i [class]="'bi ' + iconos[aviso.tipo]" aria-hidden="true"></i>
+        <div class="aviso__texto">
+            @if (aviso.titulo) {
+            <strong>{{ aviso.titulo }}</strong>
+            }
+            <span>{{ aviso.mensaje }}</span>
+        </div>
+        <button type="button" class="btn-close" aria-label="Cerrar aviso" (click)="avisos.cerrar(aviso.id)"></button>
+    </div>
+    }
+</section>
