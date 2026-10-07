@@ -49,6 +49,8 @@ export const ACCIONES = [
     'comentar',
     'activar_usuario',
     'desactivar_usuario',
+    'cambiar_contraseña',
+    'restablecer_contraseña',
 ] as const;
 export type Accion = (typeof ACCIONES)[number];
 

@@ -1,0 +1,35 @@
+# Los puertos se publican solo en 127.0.0.1 para que no queden expuestos en la red.
+name: gestion-documental
+
+services:
+  mongo:
+    image: mongo:8
+    container_name: gd-mongodb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:  # Verificar que el servicio este listo/operativo para recibir conexiones
+      # Marca el contenedor como "healthy" cuando MongoDB responde al ping
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: gd-mongo-express
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      mongo:
+        condition: service_healthy   # espera a que MongoDB esté listo antes de arrancar
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+      ME_CONFIG_BASICAUTH: "false"   # solo uso local/demostración
+      ME_CONFIG_BASICAUTH_USERNAME: ""
+
+volumes:
+  mongo_data:
