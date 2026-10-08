@@ -20,7 +20,7 @@ const esquemaActividad = new Schema<IActividad>(
         recursoTipo: { type: String, enum: TIPOS_RECURSO_ACTIVIDAD, required: true },
         recursoId: { type: Schema.Types.ObjectId, required: true },
         recursoNombre: { type: String, required: true },
-        detalle: { type: String },
+        detalle: { type: String, default: '' },
         createdAt: { type: Date, default: Date.now, required: true },
     },
     { collection: 'actividades', versionKey: false },

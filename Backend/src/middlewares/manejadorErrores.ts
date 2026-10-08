@@ -17,7 +17,7 @@ function tipoErrorBodyParser(err: unknown): string | null {
 }
 
 // Express reconoce un middleware de errores únicamente si tiene 4 parámetros (aunque no use el último).
-export function manejadorErrores(err: unknown, _req: Request, res: Response, _siguiente: NextFunction): void {
+export function manejadorErrores(err: unknown, _req: Request, res: Response, _next: NextFunction): void {
     // 1. Errores controlados lanzados por nuestro código
     if (err instanceof ErrorApp) {
         responder(res, err.codigoHttp, err.codigo, err.message, err.detalles);
