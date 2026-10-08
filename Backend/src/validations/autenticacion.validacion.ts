@@ -48,7 +48,7 @@ export function validarLogin(datos: unknown): DatosLogin {
     return { username, password };
 }
 
-export function validarCambiarPasswrod(datos: unknown): DatosCambiarPassword {
+export function validarCambiarPassword(datos: unknown): DatosCambiarPassword {
     if (!esObjeto(datos)) {
         errorValidacion([{ campo: '', mensaje: 'Los datos de la solicitud no son válidos.' }]);
     }

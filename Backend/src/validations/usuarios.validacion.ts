@@ -73,6 +73,10 @@ function validarNombreCompleto(valor: unknown): string {
 
     const nombreCompleto = valor.trim();
 
+    if (nombreCompleto.length < 2) {
+        detalles.push({ campo: 'nombreCompleto', mensaje: 'El nombre completo debe tener al menos 2 caracteres.' });
+    }
+
     if (nombreCompleto.length > 120) {
         detalles.push({ campo: 'nombreCompleto', mensaje: 'El nombre completo no puede superar los 120 caracteres.' });
     }
@@ -224,6 +228,10 @@ export function validarConsultaUsuarios(datos: unknown): ConsultaUsuarios {
         }
 
         const busqueda = datos.busqueda.trim();
+
+        if (busqueda.length > 60) {
+            errorValidacion([{ campo: 'busqueda', mensaje: 'La búsqueda no puede superar los 60 caracteres.' }]);
+        }
 
         resultado.busqueda = busqueda;
     }

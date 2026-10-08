@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { entorno } from './config/entorno.js';
 import { rutaNoEncontrada } from './middlewares/rutaNoEncontrada.js';
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
+import { rutasApi } from './routes/index.js';
 
 export function crearApp(): express.Express {
     const app = express();
@@ -17,7 +18,8 @@ export function crearApp(): express.Express {
     );
     app.use(express.json({ limit: '5mb' }));
 
-    // rutas Api
+    app.use('/api', rutasApi);
+    
     app.use(rutaNoEncontrada);
     app.use(manejadorErrores);
 

@@ -3,5 +3,5 @@ export const entorno = {
     mongoUri: 'mongodb://127.0.0.1:27017/gestion_documental',
     origenCliente: 'http://localhost:4200',
     jwtSecreto: 'clave-secreta-para-generar-token-jwt', // minimo 32 caracteres para aplicar HS256
-    jwtExpiracionHoras: 2
+    jwtExpiracionHoras: '2h'
 };
