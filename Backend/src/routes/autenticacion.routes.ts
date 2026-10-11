@@ -9,7 +9,7 @@ export const rutasAutenticacion = Router();
 rutasAutenticacion.post('/login', validarCuerpo(validarLogin), controlador.iniciarSesion);
 
 rutasAutenticacion.post(
-    '/cambiar-password',
+    '/change-password',
     requerirAutenticacion,
     validarCuerpo(validarCambiarPassword),
     controlador.cambiarPassword,

@@ -1,0 +1,201 @@
+<div class="encabezado">
+    <p class="descripcion">
+        Crea cuentas, edita sus datos y activa o desactiva el acceso.
+    </p>
+    <button type="button" class="btn btn-primary" (click)="creando.set(true)">
+        <i class="bi bi-person-plus me-1" aria-hidden="true"></i> Nuevo usuario
+    </button>
+</div>
+
+<section class="panel" aria-label="Listado de usuarios">
+    <!-- ========== Filtros ========== -->
+    <div class="filtros">
+        <div class="input-group filtros__busqueda">
+            <span class="input-group-text" aria-hidden="true"><i class="bi bi-search"></i></span>
+            <input type="search" class="form-control" placeholder="Buscar por nombre, usuario o correo"
+                aria-label="Buscar usuarios" [value]="busqueda()" (input)="alBuscar($event)" />
+        </div>
+        <select class="form-select" aria-label="Filtrar por rol" [value]="rol()" (change)="alCambiarRol($event)">
+            <option value="">Todos los roles</option>
+            <option value="administrador">Administradores</option>
+            <option value="usuario">Usuarios</option>
+        </select>
+        <select class="form-select" aria-label="Filtrar por estado" [value]="activo() === null ? '' : '' + activo()"
+            (change)="alCambiarEstadoFiltro($event)">
+            <option value="">Todos los estados</option>
+            <option value="true">Activos</option>
+            <option value="false">Inactivos</option>
+        </select>
+    </div>
+
+    <!-- ========== Contenido: error / cargando / vacío / tabla ========== -->
+    @if (errorCarga(); as mensaje) {
+    <div class="estado" role="alert">
+        <i class="bi bi-wifi-off estado__icono estado__icono--error" aria-hidden="true"></i>
+        <h2>No se pudo cargar la lista</h2>
+        <p>{{ mensaje }}</p>
+        <button type="button" class="btn btn-outline-primary" (click)="recargar()">
+            <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i> Reintentar
+        </button>
+    </div>
+    } @else if (cargando() && usuarios().length === 0) {
+    <div class="estado" role="status">
+        <span class="spinner-border text-primary" aria-hidden="true"></span>
+        <p class="mt-3 mb-0">Cargando usuarios…</p>
+    </div>
+    } @else if (usuarios().length === 0) {
+    <div class="estado">
+        <i class="bi bi-people estado__icono" aria-hidden="true"></i>
+        <h2>{{ hayFiltros() ? 'Sin resultados' : 'Aún no hay usuarios' }}</h2>
+        <p>
+            {{ hayFiltros() ? 'Ningún usuario coincide con los filtros aplicados.' : 'Crea el primer usuario para comenzar.' }}
+        </p>
+        @if (hayFiltros()) {
+        <button type="button" class="btn btn-outline-primary" (click)="limpiarFiltros()">Limpiar filtros</button>
+        }
+    </div>
+    } @else {
+    <div class="table-responsive" [class.recargando]="cargando()" [attr.aria-busy]="cargando()">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Rol</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Espacio usado</th>
+                    <th scope="col">Último acceso</th>
+                    <th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (usuario of usuarios(); track usuario.id) {
+                <tr [class.fila-inactiva]="!usuario.activo">
+                    <td>
+                        <div class="persona">
+                            <div class="persona__datos">
+                                <strong>
+                                    {{ usuario.nombreCompleto }}
+                                    @if (esPropio(usuario)) {
+                                    <span class="badge text-bg-light border ms-1">Tú</span>
+                                    }
+                                </strong>
+                                <small>&#64;{{ usuario.username }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ usuario.correo }}</td>
+                    <td>
+                        @if (usuario.rol === 'administrador') {
+                        <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis">Administrador</span>
+                        } @else {
+                        <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">Usuario</span>
+                        }
+                    </td>
+                    <td>
+                        @if (usuario.activo) {
+                        <span class="badge rounded-pill bg-success-subtle text-success-emphasis">
+                            <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Activo
+                        </span>
+                        } @else {
+                        <span class="badge rounded-pill bg-danger-subtle text-danger-emphasis">
+                            <i class="bi bi-slash-circle-fill me-1" aria-hidden="true"></i>Inactivo
+                        </span>
+                        }
+                    </td>
+                    <td class="text-nowrap">{{ formatearEspacio(usuario.espacioUsadoBytes) }}</td>
+                    <td class="text-nowrap">
+                        @if (usuario.ultimoAccesoEn) {
+                        {{ usuario.ultimoAccesoEn | date: 'dd/MM/yyyy, HH:mm' }}
+                        } @else {
+                        <span class="text-secondary">Nunca</span>
+                        }
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" title="Editar"
+                            [attr.aria-label]="'Editar a ' + usuario.nombreCompleto"
+                            (click)="usuarioEditando.set(usuario)">
+                            <i class="bi bi-pencil" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-1"
+                            title="Restablecer contraseña"
+                            [attr.aria-label]="'Restablecer la contraseña de ' + usuario.nombreCompleto"
+                            (click)="usuarioPassword.set(usuario)">
+                            <i class="bi bi-key" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm"
+                            [class]="usuario.activo ? 'btn btn-sm btn-outline-danger' : 'btn btn-sm btn-outline-success'"
+                            [disabled]="esPropio(usuario)"
+                            [title]="esPropio(usuario) ? 'No puedes desactivar tu propia cuenta' : usuario.activo ? 'Desactivar' : 'Activar'"
+                            [attr.aria-label]="(usuario.activo ? 'Desactivar a ' : 'Activar a ') + usuario.nombreCompleto"
+                            (click)="usuarioEstado.set(usuario)">
+                            <i [class]="usuario.activo ? 'bi bi-person-slash' : 'bi bi-person-check'"
+                                aria-hidden="true"></i>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ========== Paginación ========== -->
+    <nav class="paginacion" aria-label="Paginación de usuarios">
+        <span class="paginacion__rango" aria-live="polite">{{ rangoMostrado() }}</span>
+        <div class="paginacion__controles">
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                [disabled]="paginacion().pagina <= 1 || cargando()" (click)="irAPagina(paginacion().pagina - 1)">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i> Anterior
+            </button>
+            <span class="paginacion__pagina">Página {{ paginacion().pagina }} de {{ paginacion().totalPaginas }}</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                [disabled]="paginacion().pagina >= paginacion().totalPaginas || cargando()"
+                (click)="irAPagina(paginacion().pagina + 1)">
+                Siguiente <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+        </div>
+    </nav>
+    }
+</section>
+
+<!-- ========== Diálogos ========== -->
+@if (creando()) {
+<app-formulario-usuario (guardado)="alGuardarUsuario($event, false)" (cerrado)="creando.set(false)" />
+}
+
+@if (usuarioEditando(); as usuario) {
+<app-formulario-usuario [usuario]="usuario" (guardado)="alGuardarUsuario($event, true)"
+    (cerrado)="usuarioEditando.set(null)" />
+}
+
+@if (usuarioPassword(); as usuario) {
+<app-restablecer-password [usuario]="usuario" (restablecida)="alRestablecerPassword($event)"
+    (cerrado)="usuarioPassword.set(null)" />
+}
+
+@if (usuarioEstado(); as usuario) {
+<app-dialogo [titulo]="usuario.activo ? 'Desactivar usuario' : 'Activar usuario'" ancho="sm"
+    [bloqueado]="cambiandoEstado()" (cerrado)="usuarioEstado.set(null)">
+    @if (usuario.activo) {
+    <p>
+        <strong>{{ usuario.nombreCompleto }}</strong> dejará de poder iniciar sesión y se cerrará su acceso actual.
+        Podrás reactivar la cuenta cuando quieras.
+    </p>
+    } @else {
+    <p><strong>{{ usuario.nombreCompleto }}</strong> podrá volver a iniciar sesión.</p>
+    }
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-outline-secondary" [disabled]="cambiandoEstado()"
+            (click)="usuarioEstado.set(null)">
+            Cancelar
+        </button>
+        <button type="button" class="btn" [class]="usuario.activo ? 'btn btn-danger' : 'btn btn-primary'"
+            [disabled]="cambiandoEstado()" (click)="confirmarCambioEstado()">
+            @if (cambiandoEstado()) {
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            }
+            {{ usuario.activo ? 'Desactivar' : 'Activar' }}
+        </button>
+    </div>
+</app-dialogo>
+}

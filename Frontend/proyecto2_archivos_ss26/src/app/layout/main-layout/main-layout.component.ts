@@ -1,14 +1,14 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { ElementoMenu, menuParaRol } from '../../core/navegacion';
 import { ChangePasswordComponent } from '../../pages/change-password/change-password.component';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterLink, RouterOutlet, ChangePasswordComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, ChangePasswordComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.css',
 })

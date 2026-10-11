@@ -1,0 +1,97 @@
+<app-dialogo [titulo]="esEdicion() ? 'Editar usuario' : 'Nuevo usuario'" [bloqueado]="guardando()"
+    (cerrado)="cerrado.emit()">
+    @if (errorGeneral()) {
+    <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+        <i class="bi bi-exclamation-circle-fill mt-1" aria-hidden="true"></i>
+        <span>{{ errorGeneral() }}</span>
+    </div>
+    }
+
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+        @if (esEdicion()) {
+        <p class="text-secondary mb-3">
+            Usuario: <strong>&#64;{{ usuario()?.username }}</strong>
+        </p>
+        } @else {
+        <div class="mb-3">
+            <label for="fu-nombreUsuario" class="form-label">Nombre de usuario</label>
+            <input id="fu-nombreUsuario" type="text" class="form-control" formControlName="username"
+                autocomplete="off" autocapitalize="none" spellcheck="false" [class.is-invalid]="error('username')"
+                [attr.aria-describedby]="error('username') ? 'fu-error-nombreUsuario' : 'fu-ayuda-nombreUsuario'" />
+            @if (error('username'); as mensaje) {
+            <div id="fu-error-nombreUsuario" class="invalid-feedback">{{ mensaje }}</div>
+            }
+        </div>
+        }
+
+        <div class="mb-3">
+            <label for="fu-nombreCompleto" class="form-label">Nombre completo</label>
+            <input id="fu-nombreCompleto" type="text" class="form-control" formControlName="nombreCompleto"
+                autocomplete="off" [class.is-invalid]="error('nombreCompleto')"
+                [attr.aria-describedby]="error('nombreCompleto') ? 'fu-error-nombreCompleto' : null" />
+            @if (error('nombreCompleto'); as mensaje) {
+            <div id="fu-error-nombreCompleto" class="invalid-feedback">{{ mensaje }}</div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="fu-correo" class="form-label">Correo electrónico</label>
+            <input id="fu-correo" type="email" class="form-control" formControlName="correo" autocomplete="off"
+                [class.is-invalid]="error('correo')"
+                [attr.aria-describedby]="error('correo') ? 'fu-error-correo' : null" />
+            @if (error('correo'); as mensaje) {
+            <div id="fu-error-correo" class="invalid-feedback">{{ mensaje }}</div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="fu-rol" class="form-label">Rol</label>
+            <select id="fu-rol" class="form-select" formControlName="rol" aria-describedby="fu-ayuda-rol">
+                <option value="usuario">Usuario</option>
+                <option value="administrador">Administrador</option>
+            </select>
+            <div id="fu-ayuda-rol" class="form-text">
+                @if (esPropioUsuario()) {
+                No puedes cambiar tu propio rol.
+                }
+            </div>
+        </div>
+
+        @if (!esEdicion()) {
+        <div class="mb-3">
+            <label for="fu-contrasena" class="form-label">Contraseña inicial</label>
+            <div class="input-group has-validation">
+                <input id="fu-contrasena" [type]="verPassword() ? 'text' : 'password'" class="form-control"
+                    formControlName="password" autocomplete="new-password" [class.is-invalid]="error('password')"
+                    [attr.aria-describedby]="error('password') ? 'fu-error-contrasena' : 'fu-ayuda-contrasena'" />
+                <button type="button" class="btn btn-outline-secondary" (click)="alternarPassword()"
+                    [attr.aria-pressed]="verPassword()"
+                    [attr.aria-label]="verPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                    <i [class]="verPassword() ? 'bi bi-eye-slash' : 'bi bi-eye'" aria-hidden="true"></i>
+                </button>
+                @if (error('password'); as mensaje) {
+                <div id="fu-error-contrasena" class="invalid-feedback">{{ mensaje }}</div>
+                }
+            </div>
+            @if (!error('password')) {
+            <div id="fu-ayuda-contrasena" class="form-text">Mínimo 8 caracteres, con al menos una letra y un número.
+            </div>
+            }
+        </div>
+        }
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary" [disabled]="guardando()" (click)="cerrado.emit()">
+                Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+                @if (guardando()) {
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                Guardando…
+                } @else {
+                {{ esEdicion() ? 'Guardar cambios' : 'Crear usuario' }}
+                }
+            </button>
+        </div>
+    </form>
+</app-dialogo>

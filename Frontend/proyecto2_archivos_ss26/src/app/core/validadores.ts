@@ -15,6 +15,7 @@ export function camposCoinciden(campo: string, campoConfirmacion: string): Valid
     };
 }
 
+// Traduce los errores de un Control con el que se interactuo a un mensaje legible
 export function mensajeValidacion(
     control: AbstractControl | null,
     etiqueta: string,

@@ -47,7 +47,7 @@ export interface Paginacion {
     totalPaginas: number;
 }
 
-export interface PaginadaReponse<T> {
+export interface PaginadaResponse<T> {
     datos: T[];
     paginacion: Paginacion;
 }
