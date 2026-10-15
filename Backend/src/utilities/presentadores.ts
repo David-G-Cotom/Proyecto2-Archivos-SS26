@@ -1,6 +1,7 @@
 import { HydratedDocument } from "mongoose";
 import { ICarpeta } from "../models/carpeta.js";
 import { IUsuario } from "../models/usuario.js";
+import { IArchivo } from "../models/archivo.js";
 
 export function aUsuarioSesion(usuario: HydratedDocument<IUsuario>) {
     return {
@@ -35,5 +36,18 @@ export function aCarpeta(carpeta: HydratedDocument<ICarpeta>, cantidadSubcarpeta
         cantidadSubcarpetas,
         createdAt: carpeta.createdAt,
         updatedAt: carpeta.updatedAt,
+    };
+}
+
+export function aArchivo(archivo: HydratedDocument<IArchivo>) {
+    return {
+        id: String(archivo._id),
+        nombre: archivo.nombre,
+        extension: archivo.extension,
+        tipoMime: archivo.tipoMime,
+        bytesSize: archivo.bytesSize,
+        carpetaId: archivo.carpetaId ? String(archivo.carpetaId) : null,
+        createdAt: archivo.createdAt,
+        updatedAt: archivo.updatedAt,
     };
 }

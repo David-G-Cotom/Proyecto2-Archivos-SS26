@@ -1,4 +1,5 @@
 import { DetalleValidacion, errorValidacion } from "../middlewares/validar.js";
+import { ErrorSolicitudInvalida } from "../utilities/errores.js";
 
 /**
  * Política de contraseñas:
@@ -42,6 +43,14 @@ export function validarPassword(valor: unknown, campo = 'password'): string {
 
     if (detalles.length > 0) {
         errorValidacion(detalles);
+    }
+
+    return valor;
+}
+
+export function validarIdObjeto(valor: unknown): string {
+    if (typeof valor !== 'string' || !/^[0-9a-fA-F]{24}$/.test(valor)) {
+        throw new ErrorSolicitudInvalida('El identificador no es válido.');
     }
 
     return valor;
