@@ -1,0 +1,19 @@
+<button #boton type="button" class="boton" aria-haspopup="menu" [attr.aria-expanded]="abierto()"
+    [attr.aria-label]="etiquetaBoton()" (click)="alternar()">
+    <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+</button>
+
+@if (abierto()) {
+<!-- Capa transparente: un clic fuera cierra el menú -->
+<div class="cortina" (click)="cerrar()" aria-hidden="true"></div>
+<div #menu class="menu" role="menu" [style.top.px]="posicion().arriba" [style.left.px]="posicion().izquierda"
+    (keydown)="alTeclear($event)">
+    @for (accion of acciones(); track accion.id) {
+    <button type="button" role="menuitem" class="opcion" [class.opcion--peligro]="accion.peligro"
+        (click)="elegir(accion)">
+        <i [class]="'bi ' + accion.icono" aria-hidden="true"></i>
+        {{ accion.etiqueta }}
+    </button>
+    }
+</div>
+}

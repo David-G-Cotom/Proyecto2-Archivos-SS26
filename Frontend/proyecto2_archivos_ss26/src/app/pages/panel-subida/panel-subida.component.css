@@ -1,0 +1,79 @@
+.panel {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1035;
+    width: min(380px, calc(100vw - 2rem));
+    background: #fff;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 1rem;
+    box-shadow: 0 12px 40px rgb(15 23 42 / 0.2);
+    overflow: hidden;
+}
+
+.panel__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1rem;
+    background: var(--bs-tertiary-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.panel__lista {
+    max-height: 260px;
+    margin: 0;
+    padding: 0.4rem;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.fila {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.5rem 0.6rem;
+}
+
+.fila__icono {
+    margin-top: 0.1rem;
+    font-size: 1.15rem;
+    color: var(--bs-secondary-color);
+}
+
+.fila__icono--subido,
+.fila__icono--reemplazado {
+    color: var(--bs-success);
+}
+
+.fila__icono--error {
+    color: var(--bs-danger);
+}
+
+.fila__icono--subiendo {
+    color: var(--bs-primary);
+    animation: girar 1s linear infinite;
+}
+
+.fila__texto {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.fila__nombre {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.fila__texto small {
+    color: var(--bs-secondary-color);
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,72 @@
+.arbol {
+    max-height: 320px;
+    margin: 0;
+    padding: 0.4rem;
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.75rem;
+}
+
+.fila {
+    display: flex;
+    align-items: center;
+    border-radius: 0.5rem;
+}
+
+.fila--elegida {
+    background: var(--bs-primary-bg-subtle);
+}
+
+.fila__expandir,
+.fila__espacio {
+    flex: none;
+    width: 28px;
+    height: 32px;
+}
+
+.fila__expandir {
+    border: 0;
+    background: transparent;
+    color: var(--bs-secondary-color);
+}
+
+.fila__elegir {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    padding: 0.4rem 0.5rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    text-align: left;
+}
+
+.fila__elegir:hover:not(:disabled) {
+    background: var(--bs-tertiary-bg);
+}
+
+.fila--elegida .fila__elegir {
+    font-weight: 600;
+    color: var(--bs-primary-text-emphasis);
+}
+
+.fila__elegir:disabled {
+    color: var(--bs-secondary-color);
+    cursor: not-allowed;
+}
+
+.fila__nombre {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fila__motivo {
+    margin-left: auto;
+    padding-left: 0.5rem;
+    white-space: nowrap;
+    color: var(--bs-secondary-color);
+}

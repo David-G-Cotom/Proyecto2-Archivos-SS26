@@ -1,0 +1,64 @@
+<app-dialogo [titulo]="esCarpeta() ? 'Mover carpeta' : 'Mover archivo'" [bloqueado]="guardando()"
+    (cerrado)="cerrado.emit()">
+    <p class="mb-3">
+        Elige dónde quieres mover <strong>{{ nombre() }}</strong>
+        @if (esCarpeta()) {
+        junto con todo su contenido
+        }.
+    </p>
+
+    @if (errorGeneral()) {
+    <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+        <i class="bi bi-exclamation-circle-fill mt-1" aria-hidden="true"></i>
+        <span>{{ errorGeneral() }}</span>
+    </div>
+    }
+
+    @if (cargando()) {
+    <div class="text-center py-4" role="status">
+        <span class="spinner-border text-primary" aria-hidden="true"></span>
+        <p class="mt-2 mb-0 text-secondary">Cargando carpetas...</p>
+    </div>
+    } @else if (errorCarga()) {
+    <div class="alert alert-warning" role="alert">{{ errorCarga() }}</div>
+    } @else {
+    <ul class="arbol" aria-label="Carpetas disponibles como destino">
+        @for (fila of filas(); track fila.id ?? 'raiz') {
+        <li class="fila" [class.fila--elegida]="destino() === fila.id" [style.padding-left.rem]="fila.nivel * 1.3">
+            @if (fila.expandible) {
+            <button type="button" class="fila__expandir" [attr.aria-expanded]="fila.expandida"
+                [attr.aria-label]="(fila.expandida ? 'Contraer ' : 'Expandir ') + fila.nombre"
+                (click)="alternarExpansion(fila.id!)">
+                <i [class]="fila.expandida ? 'bi bi-chevron-down' : 'bi bi-chevron-right'" aria-hidden="true"></i>
+            </button>
+            } @else {
+            <span class="fila__espacio" aria-hidden="true"></span>
+            }
+            <button type="button" class="fila__elegir" [disabled]="fila.deshabilitada"
+                [attr.aria-pressed]="destino() === fila.id" (click)="destino.set(fila.id)">
+                <i [class]="fila.id === null ? 'bi bi-house-door' : 'bi bi-folder2'" aria-hidden="true"></i>
+                <span class="fila__nombre">{{ fila.nombre }}</span>
+                @if (fila.motivo) {
+                <small class="fila__motivo">{{ fila.motivo }}</small>
+                }
+            </button>
+        </li>
+        }
+    </ul>
+    }
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-outline-secondary" [disabled]="guardando()" (click)="cerrado.emit()">
+            Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" [disabled]="destino() === undefined || guardando() || cargando()"
+            (click)="mover()">
+            @if (guardando()) {
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            Moviendo...
+            } @else {
+            Mover aquí
+            }
+        </button>
+    </div>
+</app-dialogo>

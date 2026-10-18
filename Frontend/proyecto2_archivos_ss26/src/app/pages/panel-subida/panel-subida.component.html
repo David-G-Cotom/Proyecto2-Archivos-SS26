@@ -1,0 +1,45 @@
+@if (subida.elementos().length > 0) {
+<section class="panel" aria-label="Subida de archivos">
+    <header class="panel__cabecera">
+        <strong aria-live="polite">{{ titulo() }}</strong>
+        @if (!subida.activa()) {
+        <button type="button" class="btn-close" aria-label="Cerrar panel de subida"
+            (click)="subida.cerrarPanel()"></button>
+        }
+    </header>
+    <ul class="panel__lista">
+        @for (elemento of subida.elementos(); track elemento.id) {
+        <li class="fila">
+            <i [class]="'bi fila__icono fila__icono--' + elemento.estado + ' ' + iconos[elemento.estado]"
+                aria-hidden="true"></i>
+            <div class="fila__texto">
+                <span class="fila__nombre">{{ elemento.nombre }}</span>
+                <small [class.text-danger]="elemento.estado === 'error'">
+                    {{ elemento.detalle ?? etiquetas[elemento.estado] }}
+                    @if (!elemento.detalle) {
+                    - {{ size(elemento.size) }}
+                    }
+                </small>
+            </div>
+        </li>
+        }
+    </ul>
+</section>
+}
+
+<!-- Nombre repetido: el usuario debe decidir -->
+@if (subida.conflicto(); as conflicto) {
+<app-dialogo titulo="Ya existe un archivo con ese nombre" ancho="sm" [bloqueado]="true">
+    <p>
+        En esta carpeta ya hay un archivo llamado <strong>{{ conflicto.nombre }}</strong>.
+        ¿Quieres <strong>reemplazar su contenido</strong> con el archivo que estás subiendo?
+    </p>
+    <p class="text-secondary small mb-0">
+        Se conserva el mismo archivo (con sus permisos y comentarios); solo cambia su contenido.
+    </p>
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-outline-secondary" (click)="conflicto.resolver('omitir')">Omitir</button>
+        <button type="button" class="btn btn-primary" (click)="conflicto.resolver('reemplazar')">Reemplazar</button>
+    </div>
+</app-dialogo>
+}

@@ -1,0 +1,239 @@
+<!-- Aviso que aparece mientras se arrastran archivos sobre la página -->
+@if (arrastrando()) {
+<div class="zona-soltar" aria-hidden="true">
+    <div class="zona-soltar__caja">
+        <i class="bi bi-cloud-arrow-up"></i>
+        <strong>Suelta los archivos para subirlos</strong>
+        <span>
+            Se agregarán a <<{{ contenido()?.carpetaActual?.nombre ?? 'Mis archivos' }}>> - Solo .txt y .md, máx. 5 MB
+        </span>
+    </div>
+</div>
+}
+
+<!-- ===================== Barra de herramientas ===================== -->
+<div class="herramientas">
+    <nav class="migas" aria-label="Ruta de carpetas">
+        <ol class="breadcrumb mb-0">
+            @if (contenido(); as c) {
+            <li class="breadcrumb-item" [class.active]="c.ruta.length === 0"
+                [attr.aria-current]="c.ruta.length === 0 ? 'page' : null">
+                @if (c.ruta.length > 0) {
+                <a routerLink="/archivos"><i class="bi bi-house-door me-1" aria-hidden="true"></i>Mis archivos</a>
+                } @else {
+                <i class="bi bi-house-door me-1" aria-hidden="true"></i>Mis archivos
+                }
+            </li>
+            @for (miga of c.ruta; track miga.id; let ultima = $last) {
+            <li class="breadcrumb-item" [class.active]="ultima" [attr.aria-current]="ultima ? 'page' : null">
+                @if (ultima) {
+                {{ miga.nombre }}
+                } @else {
+                <a [routerLink]="['/archivos', miga.id]">{{ miga.nombre }}</a>
+                }
+            </li>
+            }
+            } @else {
+            <li class="breadcrumb-item active">Mis archivos</li>
+            }
+        </ol>
+    </nav>
+
+    <div class="herramientas__acciones">
+        <div class="btn-group" role="group" aria-label="Cambiar la vista">
+            <button type="button" class="btn btn-outline-secondary" [class.active]="vista() === 'cuadricula'"
+                [attr.aria-pressed]="vista() === 'cuadricula'" title="Vista de cuadrícula"
+                (click)="cambiarVista('cuadricula')">
+                <i class="bi bi-grid" aria-hidden="true"></i>
+                <span class="visually-hidden">Cuadrícula</span>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" [class.active]="vista() === 'lista'"
+                [attr.aria-pressed]="vista() === 'lista'" title="Vista de lista" (click)="cambiarVista('lista')">
+                <i class="bi bi-list-ul" aria-hidden="true"></i>
+                <span class="visually-hidden">Lista</span>
+            </button>
+        </div>
+        <button type="button" class="btn btn-outline-primary" (click)="abrirSelectorArchivos()">
+            <i class="bi bi-upload me-1" aria-hidden="true"></i> Subir archivo
+        </button>
+        <button type="button" class="btn btn-primary" (click)="creando.set(true)">
+            <i class="bi bi-folder-plus me-1" aria-hidden="true"></i> Nueva carpeta
+        </button>
+        <!-- Campo oculto: el botón "Subir archivo" lo abre. Se admite elegir varios archivos a la vez. -->
+        <input #entradaArchivos type="file" class="d-none" multiple accept=".txt,.md,text/plain,text/markdown"
+            tabindex="-1" aria-hidden="true" (change)="alElegirArchivos($event)" />
+    </div>
+</div>
+
+<!-- ===================== Contenido ===================== -->
+@if (errorCarga(); as mensaje) {
+<section class="estado" role="alert">
+    <i class="bi bi-exclamation-triangle estado__icono estado__icono--error" aria-hidden="true"></i>
+    <h2>No pudimos abrir esta carpeta</h2>
+    <p>{{ mensaje }}</p>
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+        <button type="button" class="btn btn-outline-primary" (click)="recargar()">
+            <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i> Reintentar
+        </button>
+        <a class="btn btn-primary" routerLink="/archivos">Ir a Mis archivos</a>
+    </div>
+</section>
+} @else if (contenido() === null) {
+<section class="estado" role="status">
+    <span class="spinner-border text-primary" aria-hidden="true"></span>
+    <p class="mt-3 mb-0">Cargando…</p>
+</section>
+} @else if (contenido(); as c) {
+@if (c.subcarpetas.length === 0 && c.archivos.length === 0) {
+<section class="estado">
+    <i class="bi bi-folder2-open estado__icono" aria-hidden="true"></i>
+    <h2>{{ c.carpetaActual ? 'Esta carpeta está vacía' : 'Aún no tienes nada aquí' }}</h2>
+    <p>Sube archivos <strong>.txt</strong> o <strong>.md</strong> (también puedes arrastrarlos hasta aquí) o crea una
+        carpeta para organizarlos.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+        <button type="button" class="btn btn-outline-primary" (click)="abrirSelectorArchivos()">
+            <i class="bi bi-upload me-1" aria-hidden="true"></i> Subir archivo
+        </button>
+        <button type="button" class="btn btn-primary" (click)="creando.set(true)">
+            <i class="bi bi-folder-plus me-1" aria-hidden="true"></i> Nueva carpeta
+        </button>
+    </div>
+</section>
+} @else {
+<p class="pista">
+    <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
+    Haz doble clic en una carpeta o archivo para abrirlo.
+</p>
+
+<div [class.recargando]="cargando()" [attr.aria-busy]="cargando()">
+    @if (vista() === 'cuadricula') {
+    <!-- ---------- Vista de cuadricula ---------- -->
+    <ul class="cuadricula" aria-label="Carpetas y archivos">
+        @for (carpeta of c.subcarpetas; track carpeta.id) {
+        <li class="tarjeta">
+            <button type="button" class="tarjeta__principal" title="Doble clic para abrir"
+                [attr.aria-label]="'Carpeta ' + carpeta.nombre + '. ' + textoSubcarpetas(carpeta) + '. Pulsa Enter para abrir.'"
+                (click)="alClicElemento($event, () => abrirCarpeta(carpeta))" (dblclick)="abrirCarpeta(carpeta)">
+                <i class="bi bi-folder-fill tarjeta__icono" aria-hidden="true"></i>
+                <span class="tarjeta__nombre">{{ carpeta.nombre }}</span>
+                <small class="tarjeta__detalle">{{ textoSubcarpetas(carpeta) }}</small>
+            </button>
+            <div class="tarjeta__menu">
+                <app-menu-acciones [acciones]="accionesCarpeta"
+                    [etiquetaBoton]="'Acciones de la carpeta ' + carpeta.nombre"
+                    (seleccionada)="alElegirAccionCarpeta($event, carpeta)" />
+            </div>
+        </li>
+        }
+        @for (archivo of c.archivos; track archivo.id) {
+        <li class="tarjeta">
+            <button type="button" class="tarjeta__principal" title="Doble clic para ver"
+                [attr.aria-label]="'Archivo ' + archivo.nombre + ', ' + size(archivo) + '. Pulsa Enter para abrir.'"
+                (click)="alClicElemento($event, () => abrirArchivo(archivo))" (dblclick)="abrirArchivo(archivo)">
+                <i [class]="'bi tarjeta__icono tarjeta__icono--archivo ' + iconoArchivo(archivo)"
+                    aria-hidden="true"></i>
+                <span class="tarjeta__nombre">{{ archivo.nombre }}</span>
+                <small class="tarjeta__detalle">{{ size(archivo) }}</small>
+            </button>
+            <div class="tarjeta__menu">
+                <app-menu-acciones [acciones]="accionesArchivo"
+                    [etiquetaBoton]="'Acciones del archivo ' + archivo.nombre"
+                    (seleccionada)="alElegirAccionArchivo($event, archivo)" />
+            </div>
+        </li>
+        }
+    </ul>
+    } @else {
+    <!-- ---------- Vista de lista ---------- -->
+    <div class="panel-lista">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col" class="d-none d-md-table-cell">Tamaño / Contenido</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Modificado</th>
+                        <th scope="col" class="text-end"><span class="visually-hidden">Acciones</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (carpeta of c.subcarpetas; track carpeta.id) {
+                    <tr (dblclick)="abrirCarpeta(carpeta)">
+                        <td>
+                            <button type="button" class="celda-nombre" title="Doble clic para abrir"
+                                [attr.aria-label]="'Carpeta ' + carpeta.nombre + '. Pulsa Enter para abrir.'"
+                                (click)="alClicElemento($event, () => abrirCarpeta(carpeta))">
+                                <i class="bi bi-folder-fill" aria-hidden="true"></i>
+                                <span>{{ carpeta.nombre }}</span>
+                            </button>
+                        </td>
+                        <td class="d-none d-md-table-cell text-secondary">{{ textoSubcarpetas(carpeta) }}</td>
+                        <td class="d-none d-sm-table-cell text-secondary text-nowrap">
+                            {{ carpeta.updatedAt| date: 'dd/MM/yyyy, HH:mm' }}
+                        </td>
+                        <td class="text-end">
+                            <app-menu-acciones [acciones]="accionesCarpeta"
+                                [etiquetaBoton]="'Acciones de la carpeta ' + carpeta.nombre"
+                                (seleccionada)="alElegirAccionCarpeta($event, carpeta)" />
+                        </td>
+                    </tr>
+                    }
+                    @for (archivo of c.archivos; track archivo.id) {
+                    <tr (dblclick)="abrirArchivo(archivo)">
+                        <td>
+                            <button type="button" class="celda-nombre" title="Doble clic para ver"
+                                [attr.aria-label]="'Archivo ' + archivo.nombre + '. Pulsa Enter para abrir.'"
+                                (click)="alClicElemento($event, () => abrirArchivo(archivo))">
+                                <i [class]="'bi celda-nombre__icono--archivo ' + iconoArchivo(archivo)"
+                                    aria-hidden="true"></i>
+                                <span>{{ archivo.nombre }}</span>
+                            </button>
+                        </td>
+                        <td class="d-none d-md-table-cell text-secondary">{{ size(archivo) }}</td>
+                        <td class="d-none d-sm-table-cell text-secondary text-nowrap">
+                            {{ archivo.updatedAt| date: 'dd/MM/yyyy, HH:mm' }}
+                        </td>
+                        <td class="text-end">
+                            <app-menu-acciones [acciones]="accionesArchivo"
+                                [etiquetaBoton]="'Acciones del archivo ' + archivo.nombre"
+                                (seleccionada)="alElegirAccionArchivo($event, archivo)" />
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+</div>
+}
+}
+
+<!-- ===================== Panel de subida ===================== -->
+<app-panel-subida />
+
+<!-- ===================== Dialogos ===================== -->
+@if (creando()) {
+<app-dialogo-nombre-carpeta [carpetaPadreId]="contenido()?.carpetaActual?.id ?? null"
+    (guardada)="alCrearCarpeta($event)" (cerrado)="creando.set(false)" />
+}
+
+@if (carpetaRenombrando(); as carpeta) {
+<app-dialogo-nombre-carpeta [carpeta]="carpeta" (guardada)="alRenombrarCarpeta($event)"
+    (cerrado)="carpetaRenombrando.set(null)" />
+}
+
+@if (carpetaMoviendo(); as carpeta) {
+<app-mover-elemento [carpeta]="carpeta" (movido)="alMoverCarpeta(carpeta, $event)"
+    (cerrado)="carpetaMoviendo.set(null)" />
+}
+
+@if (archivoRenombrando(); as archivo) {
+<app-dialogo-renombrar-archivo [archivo]="archivo" (renombrado)="alRenombrarArchivo($event)"
+    (cerrado)="archivoRenombrando.set(null)" />
+}
+
+@if (archivoMoviendo(); as archivo) {
+<app-mover-elemento [archivo]="archivo" (movido)="alMoverArchivo(archivo, $event)"
+    (cerrado)="archivoMoviendo.set(null)" />
+}
