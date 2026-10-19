@@ -9,6 +9,8 @@ export const TIPOS_MIME: Record<Extension, string> = {
     md: 'text/markdown',
 };
 
+export const SIZE_MAXIMO_ARCHIVO_BYTES = 5 * 1024 * 1024;
+
 export const TIPOS_RECURSO = ['archivo', 'carpeta'] as const;
 export type TipoRecurso = (typeof TIPOS_RECURSO)[number];
 
@@ -56,3 +58,6 @@ export type Accion = (typeof ACCIONES)[number];
 
 /** Bucket GridFS: genera las colecciones contenidos.files y contenidos.chunks */
 export const NOMBRE_BUCKET_CONTENIDOS = 'contenidos';
+
+// Comparación de nombres ignorando mayusculas
+export const COLACION_ES = { locale: 'es', strength: 2 } as const;

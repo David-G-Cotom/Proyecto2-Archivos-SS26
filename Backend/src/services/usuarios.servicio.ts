@@ -123,7 +123,7 @@ export async function actualizarUsuario(id: string, datos: DatosActualizarUsuari
             recursoTipo: 'usuario',
             recursoId: usuario._id,
             recursoNombre: usuario.username,
-            detalle: detalleTexto
+            detalle: 'detalleTexto: ' + detalleTexto
         });
     }
 

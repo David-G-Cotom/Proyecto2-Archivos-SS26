@@ -12,7 +12,7 @@ export async function conectarBaseDatos(): Promise<void> {
     await mongoose.connect(entorno.mongoUri, { serverSelectionTimeoutMS: 5000 });
 
     const db = mongoose.connection.db;
-    if (!db) throw new Error('La conexión a MongoDB no expone la base de datos.');
+    if (!db) throw new Error('La conexion a MongoDB no expone la base de datos.');
 
     bucketContenidos = new mongoose.mongo.GridFSBucket(db, { bucketName: NOMBRE_BUCKET_CONTENIDOS });
     console.log(`[BD] Conectado a MongoDB (${mongoose.connection.name})`);
@@ -22,7 +22,7 @@ export async function conectarBaseDatos(): Promise<void> {
  * Devuelve el bucket GridFS (colecciones contenidos.files y contenidos.chunks).
  */
 export function obtenerBucketContenidos(): mongoose.mongo.GridFSBucket {
-    if (!bucketContenidos) throw new Error('El bucket GridFS aún no está inicializado.');
+    if (!bucketContenidos) throw new Error('El bucket GridFS aun no esta inicializado.');
     return bucketContenidos;
 }
 

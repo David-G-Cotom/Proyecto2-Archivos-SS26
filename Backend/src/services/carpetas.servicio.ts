@@ -5,11 +5,9 @@ import { ErrorConflicto, ErrorNoEncontrado } from "../utilities/errores.js";
 import { aArchivo, aCarpeta } from "../utilities/presentadores.js";
 import { registrarActividad } from "./actividad.servicio.js";
 import { ICarpeta } from "../models/carpeta.js";
+import { COLACION_ES } from "../constants/dominio.js";
 
 type Id = mongoose.Types.ObjectId;
-
-// Comparación de nombres ignorando mayúsculas
-const COLACION_ES = { locale: 'es', strength: 2 } as const;
 
 export async function obtenerCarpetaPropia(id: string | Id, actor: UsuarioAutenticado) {
     const carpeta = await Carpeta.findOne({ _id: id, propietarioId: actor.id, eliminacion: null });
@@ -135,7 +133,7 @@ export async function crearCarpeta(actor: UsuarioAutenticado, nombre: string, ca
         recursoTipo: 'carpeta',
         recursoId: carpeta._id,
         recursoNombre: carpeta.nombre,
-        detalle: 'carpetaPadreID: ' + (padre?._id.toString() ?? ''),
+        detalle: 'carpetaPadreID: ' + (String(padre?._id) ?? ''),
     });
 
     return aCarpeta(carpeta, 0);
@@ -159,7 +157,7 @@ export async function renombrarCarpeta(id: string, nombre: string, actor: Usuari
             recursoTipo: 'carpeta',
             recursoId: carpeta._id,
             recursoNombre: carpeta.nombre,
-            detalle: nombreAnterior,
+            detalle: 'nombreAnterior: ' + nombreAnterior
         });
     }
 
@@ -239,9 +237,9 @@ export async function moverCarpeta(id: string, destinoId: string | null, actor: 
         recursoId: carpeta._id,
         recursoNombre: carpeta.nombre,
         detalle:
-            'desdeId: ' + (padreActualId?.toString() ?? '') +
-            'desdeNombre: ' + (origen?.nombre ?? 'Mis archivos') +
-            'haciaId: ' + (destinoid?.toString() ?? '') +
+            'desdeId: ' + (String(padreActualId) ?? '') + ' - ' +
+            'desdeNombre: ' + (origen?.nombre ?? 'Mis archivos') + ' - ' +
+            'haciaId: ' + (String(destinoid) ?? '') + ' - ' +
             'haciaNombre: ' + (destino?.nombre ?? 'Mis archivos')
     });
 
