@@ -17,6 +17,7 @@ import { descargarBlob } from '../../core/descarga';
 import { PanelSubidaComponent } from '../panel-subida/panel-subida.component';
 import { MoverElementoComponent } from '../mover-elemento/mover-elemento.component';
 import { DialogoRenombrarArchivoComponent } from '../dialogo-renombrar-archivo/dialogo-renombrar-archivo.component';
+import { DialogoConfirmacionComponent } from '../../shared/components/dialogo-confirmacion/dialogo-confirmacion.component';
 
 type Vista = 'lista' | 'cuadricula';
 const CLAVE_VISTA = 'gestor-documental-vista-archivos';
@@ -42,8 +43,9 @@ function traeArchivos(evento: DragEvent): boolean {
     MoverElementoComponent,
     DialogoRenombrarArchivoComponent,
     DatePipe,
-    RouterLink
-  ],
+    RouterLink,
+    DialogoConfirmacionComponent
+],
   templateUrl: './archivos.component.html',
   styleUrl: './archivos.component.css',
 })
@@ -72,11 +74,15 @@ export class ArchivosComponent {
   protected readonly carpetaMoviendo = signal<Carpeta | null>(null);
   protected readonly archivoRenombrando = signal<Archivo | null>(null);
   protected readonly archivoMoviendo = signal<Archivo | null>(null);
+  protected readonly carpetaEliminando = signal<Carpeta | null>(null);
+  protected readonly archivoEliminando = signal<Archivo | null>(null);
+  protected readonly eliminando = signal(false);
 
   protected readonly accionesCarpeta: AccionMenu[] = [
     { id: 'abrir', etiqueta: 'Abrir', icono: 'bi-folder2-open' },
     { id: 'renombrar', etiqueta: 'Renombrar', icono: 'bi-pencil' },
     { id: 'mover', etiqueta: 'Mover a…', icono: 'bi-folder-symlink' },
+    { id: 'eliminar', etiqueta: 'Mover a la papelera', icono: 'bi-trash3', peligro: true }
   ];
 
   protected readonly accionesArchivo: AccionMenu[] = [
@@ -84,6 +90,7 @@ export class ArchivosComponent {
     { id: 'descargar', etiqueta: 'Descargar', icono: 'bi-download' },
     { id: 'renombrar', etiqueta: 'Renombrar', icono: 'bi-pencil' },
     { id: 'mover', etiqueta: 'Mover a…', icono: 'bi-folder-symlink' },
+    { id: 'eliminar', etiqueta: 'Mover a la papelera', icono: 'bi-trash3', peligro: true },
   ];
 
   private readonly esTactil = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
@@ -145,6 +152,7 @@ export class ArchivosComponent {
     if (accionId === 'abrir') this.abrirCarpeta(carpeta);
     else if (accionId === 'renombrar') this.carpetaRenombrando.set(carpeta);
     else if (accionId === 'mover') this.carpetaMoviendo.set(carpeta);
+    else if (accionId === 'eliminar') this.carpetaEliminando.set(carpeta);
   }
 
   protected alCrearCarpeta(carpeta: Carpeta): void {
@@ -171,6 +179,7 @@ export class ArchivosComponent {
     else if (accionId === 'descargar') this.descargar(archivo);
     else if (accionId === 'renombrar') this.archivoRenombrando.set(archivo);
     else if (accionId === 'mover') this.archivoMoviendo.set(archivo);
+    else if (accionId === 'eliminar') this.archivoEliminando.set(archivo);
   }
 
   private descargar(archivo: Archivo): void {
@@ -190,6 +199,35 @@ export class ArchivosComponent {
     this.archivoMoviendo.set(null);
     this.avisos.exito(`«${archivo.nombre}» ahora está en <<${nombreDestino}>>.`, 'Archivo movido');
     this.recargar();
+  }
+
+  // ----- Enviar a la papelera -----
+  protected confirmarEliminacion(): void {
+    const carpeta = this.carpetaEliminando();
+    const archivo = this.archivoEliminando();
+    const nombre = carpeta?.nombre ?? archivo?.nombre;
+    if (!nombre) return;
+
+    const peticion = carpeta ? this.carpetasApi.eliminar(carpeta.id) : this.archivosApi.eliminar(archivo!.id);
+    this.eliminando.set(true);
+
+    peticion.subscribe({
+      next: () => {
+        this.terminarEliminacion();
+        this.avisos.exito(`<<${nombre}>> se movió a la papelera. Puedes restaurarlo desde ahí.`, 'Movido a la papelera');
+        this.recargar();
+      },
+      error: (error: unknown) => {
+        this.terminarEliminacion();
+        this.avisos.error(mensajeDeError(error, 'No se pudo mover a la papelera.'), 'No se pudo completar');
+      },
+    });
+  }
+
+  private terminarEliminacion(): void {
+    this.eliminando.set(false);
+    this.carpetaEliminando.set(null);
+    this.archivoEliminando.set(null);
   }
 
   // ----- Subida de archivos -----

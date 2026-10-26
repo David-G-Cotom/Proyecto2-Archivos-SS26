@@ -46,4 +46,8 @@ export class ArchivosService {
     return this.http.patch<Archivo>(`${this.url}/${id}/mover`, { destinoId });
   }
 
+  eliminar(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
 }

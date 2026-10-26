@@ -237,3 +237,24 @@
 <app-mover-elemento [archivo]="archivo" (movido)="alMoverArchivo(archivo, $event)"
     (cerrado)="archivoMoviendo.set(null)" />
 }
+
+@if (carpetaEliminando(); as carpeta) {
+<app-dialogo-confirmacion titulo="¿Mover la carpeta a la papelera?" etiquetaConfirmar="Mover a la papelera"
+    [peligro]="true" [ocupado]="eliminando()" (confirmado)="confirmarEliminacion()"
+    (cancelado)="carpetaEliminando.set(null)">
+    <p>
+        La carpeta <strong>{{ carpeta.nombre }}</strong> se moverá a la papelera
+        <strong>junto con todas sus subcarpetas y archivos</strong>.
+    </p>
+    <p class="text-secondary small">Podrás restaurarla mientras no la elimines definitivamente.</p>
+</app-dialogo-confirmacion>
+}
+
+@if (archivoEliminando(); as archivo) {
+<app-dialogo-confirmacion titulo="¿Mover el archivo a la papelera?" etiquetaConfirmar="Mover a la papelera"
+    [peligro]="true" [ocupado]="eliminando()" (confirmado)="confirmarEliminacion()"
+    (cancelado)="archivoEliminando.set(null)">
+    <p>El archivo <strong>{{ archivo.nombre }}</strong> se moverá a la papelera.</p>
+    <p class="text-secondary small">Podrás restaurarlo mientras no lo elimines definitivamente.</p>
+</app-dialogo-confirmacion>
+}

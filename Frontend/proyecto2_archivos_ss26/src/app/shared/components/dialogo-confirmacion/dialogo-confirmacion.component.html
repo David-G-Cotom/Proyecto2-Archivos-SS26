@@ -1,0 +1,22 @@
+<app-dialogo [titulo]="titulo()" ancho="sm" [bloqueado]="ocupado()" (cerrado)="cancelado.emit()">
+    <div class="d-flex gap-3">
+        <span class="icono" [class.icono--peligro]="peligro()" aria-hidden="true">
+            <i [class]="'bi ' + icono()"></i>
+        </span>
+        <div class="mensaje"><ng-content /></div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-outline-secondary" autofocus [disabled]="ocupado()"
+            (click)="cancelado.emit()">
+            Cancelar
+        </button>
+        <button type="button" [class]="peligro() ? 'btn btn-danger' : 'btn btn-primary'" [disabled]="ocupado()"
+            (click)="confirmado.emit()">
+            @if (ocupado()) {
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            }
+            {{ etiquetaConfirmar() }}
+        </button>
+    </div>
+</app-dialogo>

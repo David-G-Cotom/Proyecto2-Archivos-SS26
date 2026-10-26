@@ -1,0 +1,77 @@
+@if (error(); as mensaje) {
+<section class="estado" role="alert">
+    <i class="bi bi-file-earmark-x estado__icono" aria-hidden="true"></i>
+    <h2>No pudimos abrir este archivo</h2>
+    <p>{{ mensaje }}</p>
+    <a class="btn btn-primary" routerLink="/archivos">Ir a Mis archivos</a>
+</section>
+} @else if (detalle(); as d) {
+<!-- ---------- Ruta ---------- -->
+<nav class="migas" aria-label="Ubicación del archivo">
+    <ol class="breadcrumb mb-3">
+        <li class="breadcrumb-item">
+            <a routerLink="/archivos"><i class="bi bi-house-door me-1" aria-hidden="true"></i>Mis archivos</a>
+        </li>
+        @for (miga of d.ruta; track miga.id) {
+        <li class="breadcrumb-item"><a [routerLink]="['/archivos', miga.id]">{{ miga.nombre }}</a></li>
+        }
+        <li class="breadcrumb-item active" aria-current="page">{{ d.archivo.nombre }}</li>
+    </ol>
+</nav>
+
+<article class="documento" [attr.aria-busy]="cargando()">
+    <!-- ---------- Encabezado ---------- -->
+    <header class="documento__cabecera">
+        <div class="documento__titulo">
+            <i [class]="'bi ' + (esMarkdown() ? 'bi-markdown-fill' : 'bi-file-earmark-text-fill')"
+                aria-hidden="true"></i>
+            <div class="documento__datos">
+                <h2>{{ d.archivo.nombre }}</h2>
+                <small>{{ size() }} - Modificado el {{ d.archivo.updatedAt| date: 'dd/MM/yyyy, HH:mm' }}</small>
+            </div>
+        </div>
+
+        <div class="documento__acciones">
+            @if (esMarkdown()) {
+            <div class="btn-group" role="group" aria-label="Forma de mostrar el contenido">
+                <button type="button" class="btn btn-outline-secondary" [class.active]="modo() === 'renderizado'"
+                    [attr.aria-pressed]="modo() === 'renderizado'" (click)="cambiarModo('renderizado')">
+                    <i class="bi bi-eye me-1" aria-hidden="true"></i>Vista Markdown
+                </button>
+                <button type="button" class="btn btn-outline-secondary" [class.active]="modo() === 'original'"
+                    [attr.aria-pressed]="modo() === 'original'" (click)="cambiarModo('original')">
+                    <i class="bi bi-code-slash me-1" aria-hidden="true"></i>Texto original
+                </button>
+            </div>
+            }
+            <a class="btn btn-outline-secondary" [routerLink]="enlaceCarpeta()">
+                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Volver
+            </a>
+            <button type="button" class="btn btn-primary" [disabled]="descargando()" (click)="descargar()">
+                @if (descargando()) {
+                <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                } @else {
+                <i class="bi bi-download me-1" aria-hidden="true"></i>
+                }
+                Descargar
+            </button>
+        </div>
+    </header>
+
+    <!-- ---------- Contenido ---------- -->
+    <div class="documento__cuerpo">
+        @if (texto().length === 0) {
+        <p class="vacio"><i class="bi bi-file-earmark me-1" aria-hidden="true"></i>Este archivo está vacío.</p>
+        } @else if (esMarkdown() && modo() === 'renderizado') {
+        <div class="markdown-cuerpo" [innerHTML]="htmlRenderizado()"></div>
+        } @else {
+        <pre class="texto-plano" tabindex="0" aria-label="Contenido del archivo">{{ texto() }}</pre>
+        }
+    </div>
+</article>
+} @else {
+<section class="estado" role="status">
+    <span class="spinner-border text-primary" aria-hidden="true"></span>
+    <p class="mt-3 mb-0">Abriendo archivo...</p>
+</section>
+}

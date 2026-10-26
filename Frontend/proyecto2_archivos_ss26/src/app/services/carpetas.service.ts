@@ -34,4 +34,8 @@ export class CarpetasService {
     return this.http.patch<Carpeta>(`${this.url}/${id}/mover`, { destinoId });
   }
 
+  eliminar(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
 }

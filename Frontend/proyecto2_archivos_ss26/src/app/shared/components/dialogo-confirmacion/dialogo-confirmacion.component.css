@@ -1,0 +1,29 @@
+.icono {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+}
+
+.icono--peligro {
+    background: var(--bs-danger-bg-subtle);
+    color: var(--bs-danger);
+}
+
+.mensaje {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.mensaje :where(p) {
+    margin-bottom: 0.5rem;
+}
+
+.mensaje :where(p:last-child) {
+    margin-bottom: 0;
+}
